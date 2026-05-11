@@ -1,6 +1,6 @@
 import coal
 """
-ProxQP - FINAL WORKING VERSION
+ProxQP 
 
 Key fixes:
 1. Proper acceleration cost via finite differences
@@ -116,9 +116,6 @@ class TrajectoryOptimizerProxQPV2:
 
 
 if __name__ == "__main__":
-    print("="*80)
-    print("FINAL PROXQP TEST")
-    print("="*80)
     
     urdf = "/scratch/anshb3/ovla/robots/franka/franka_panda_with_inertia.urdf"
     optimizer = TrajectoryOptimizerProxQPV2(urdf)
@@ -155,6 +152,4 @@ if __name__ == "__main__":
     print(f"  Energy: {energy:.3f} J")
     
     if metrics['converged'] and metrics['goal_error'] < 1e-3 and motion > 0.5 and energy > 0.1:
-        print("\n✅ PROXQP FINALLY WORKS!")
-    else:
-        print("\n❌ Still issues")
+        print("\n PROXQP WORKS!")
