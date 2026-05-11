@@ -7,7 +7,7 @@ Extends V6 with support for multiple analytic obstacle types:
 - Capsules (line segment obstacles, like poles/limbs)
 - Boxes (rectangular obstacles, like tables/walls)
 
-All obstacles have exact analytic distance functions → smooth gradients.
+All obstacles have exact analytic distance functions, smooth gradients.
 """
 
 import numpy as np
@@ -74,7 +74,7 @@ class CasadiOptimizerV6:
         self.rnea_func = ca.Function('rnea', [cq, cv, ca_acc], [ctau])
         
         # Forward Kinematics for multiple frames
-        # We'll create FK functions for all collision-relevant links
+        # create FK functions for all collision-relevant links
         self.fk_funcs = {}
         
         # Get end-effector (last frame)
@@ -87,8 +87,8 @@ class CasadiOptimizerV6:
         # For now, we'll use end-effector as primary collision point
         
         if self.verbose:
-            print("  ✓ RNEA function built")
-            print("  ✓ FK functions built")
+            print(" RNEA function built")
+            print(" FK functions built")
     
     def _distance_point_to_sphere(self, point: ca.SX, sphere_center: np.ndarray, sphere_radius: float) -> ca.SX:
         """
@@ -207,9 +207,7 @@ class CasadiOptimizerV6:
         weights = default_weights
         
         if self.verbose:
-            print(f"\n{'='*80}")
             print(f"CASADI OPTIMIZER V6 - MULTI-OBJECTIVE OPTIMIZATION")
-            print(f"{'='*80}")
             print(f"Waypoints: {n_waypoints}")
             print(f"Obstacles: {len(obstacles)}")
             print(f"Weights: {weights}")
@@ -217,9 +215,7 @@ class CasadiOptimizerV6:
         
         t_start = time.time()
         
-        # =====================================================================
         # BUILD OPTIMIZATION PROBLEM
-        # =====================================================================
         
         opti = ca.Opti()
         
@@ -238,9 +234,7 @@ class CasadiOptimizerV6:
         cost_jerk = 0
         cost_duration = n_waypoints * dt
         
-        # =====================================================================
         # DYNAMICS AND SMOOTHNESS
-        # =====================================================================
         
         for t in range(1, n_waypoints - 1):
             # Velocity and acceleration (finite differences)
@@ -267,9 +261,7 @@ class CasadiOptimizerV6:
             jerk_t = (a_t1 - a_t) / dt
             cost_jerk += ca.sumsqr(jerk_t) * dt
         
-        # =====================================================================
         # COLLISION AVOIDANCE
-        # =====================================================================
         
         collision_violations = 0
         
@@ -314,9 +306,7 @@ class CasadiOptimizerV6:
                 penalty = ca.fmax(0, penalty_threshold - dist) ** 2
                 collision_violations += penalty
         
-        # =====================================================================
         # TOTAL COST
-        # =====================================================================
         
         total_cost = (
             weights['smoothness'] * cost_smoothness +
@@ -328,10 +318,7 @@ class CasadiOptimizerV6:
         
         opti.minimize(total_cost)
         
-        # =====================================================================
-        # BOUNDARY CONDITIONS AND LIMITS
-        # =====================================================================
-        
+        # BOUNDARY CONDITIONS AND LIMITS        
         # Fixed start and goal
         opti.subject_to(Q[:, 0] == q_start)
         opti.subject_to(Q[:, -1] == q_goal)
@@ -344,10 +331,7 @@ class CasadiOptimizerV6:
         opti.subject_to(dt >= 0.001)
         opti.subject_to(dt <= 0.5)
         
-        # =====================================================================
-        # SOLVE
-        # =====================================================================
-        
+        # SOLVE        
         # IPOPT options
         p_opts = {"expand": True}
         s_opts = {
@@ -378,8 +362,8 @@ class CasadiOptimizerV6:
             
         except RuntimeError as e:
             if self.verbose:
-                print(f"\n⚠️  Solver did not fully converge: {e}")
-                print("Returning best available solution...")
+                print(f"\nSolver did not fully converge: {e}")
+                print("Returning best available solution")
             
             q_opt = opti.debug.value(Q).T
             dt_opt = opti.debug.value(dt)
@@ -396,10 +380,7 @@ class CasadiOptimizerV6:
         
         solve_time = time.time() - t_start
         
-        # =====================================================================
-        # COMPUTE FINAL METRICS
-        # =====================================================================
-        
+        # COMPUTE FINAL METRICS        
         # Compute actual energy, peak torque, etc.
         energy = 0.0
         peak_torque = 0.0
@@ -441,9 +422,7 @@ class CasadiOptimizerV6:
 
 
 if __name__ == "__main__":
-    print("="*80)
     print("TESTING CASADI OPTIMIZER V6 - MULTI-OBSTACLE")
-    print("="*80)
     
     urdf = "/scratch/anshb3/ovla/robots/franka/franka_panda_with_inertia.urdf"
     
@@ -481,5 +460,4 @@ if __name__ == "__main__":
         n_waypoints=50
     )
     
-    print("\n✅ TEST COMPLETE")
     print(f"Generated trajectory: {q_traj.shape}")
