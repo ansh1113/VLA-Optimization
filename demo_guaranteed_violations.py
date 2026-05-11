@@ -1,5 +1,4 @@
 """
-GUARANTEED VIOLATIONS DEMO
 Strategy: Set goal that requires going OUTSIDE convex hull of limits
 """
 
@@ -19,11 +18,9 @@ def create_baseline(q_start, q_goal, n_waypoints=50):
 urdf_path = "../robots/franka/franka_panda_proper.urdf"
 model = pin.buildModelFromUrdf(urdf_path)
 
-print("="*80)
 print("O-VLA PHASE 2: FINAL DEMONSTRATION")
-print("="*80)
 
-# GUARANTEED violation scenario
+# violation scenario
 # Joint 3: [-3.072, -0.070] (MUST be negative!)
 # Joint 5: [-0.018, 3.752] (mostly positive)
 
@@ -33,13 +30,6 @@ q_start = model.lowerPositionLimit.copy()
 # Goal: All joints at UPPER limit  
 q_goal = model.upperPositionLimit.copy()
 
-# For Joint 3: going from -3.072 to -0.070
-# Linear interpolation will go: -3.072 → -1.5 → 0 → 1.5 → -0.070 (WRAPS AROUND!)
-# Actually no, it will just linearly go from -3.072 to -0.070, staying in range
-
-# Different strategy: Make joint velocity limit violations
-# By having very large changes, baseline won't respect velocity limits
-
 print("\nScenario: EXTREME MOTION")
 print("  Start: All joints at MINIMUM limits")
 print("  Goal:  All joints at MAXIMUM limits")
@@ -47,11 +37,11 @@ print("  Baseline: Violates velocity/acceleration limits")
 print("  Phase 2: Finds smooth, feasible path")
 
 print("\n" + "="*80)
-print("GENERATING TRAJECTORIES...")
+print("GENERATING TRAJECTORIES")
 print("="*80)
 
 # BASELINE
-print("\n1️⃣  BASELINE (Linear Interpolation):")
+print("\n BASELINE (Linear Interpolation):")
 traj_baseline = create_baseline(q_start, q_goal, n_waypoints=50)
 
 # Check position violations
@@ -78,7 +68,7 @@ print(f"   TOTAL: {pos_violations + vel_violations} violations")
 total_baseline_violations = pos_violations + vel_violations
 
 # V4
-print("\n2️⃣  PHASE 2 V4:")
+print("\n PHASE 2 V4:")
 start_time = time.time()
 v4_opt = HierarchicalOptimizerV4(urdf_path, verbose=False)
 traj_v4, metrics_v4 = v4_opt.optimize_trajectory(q_start, q_goal, n_waypoints=50)
@@ -95,7 +85,7 @@ print(f"   Position violations: {v4_violations}")
 print(f"   Energy: {metrics_v4['energy']['total_energy']:.1f} J")
 
 # V6
-print("\n3️⃣  PHASE 2 V6:")
+print("\n PHASE 2 V6:")
 start_time = time.time()
 try:
     v6_opt = CasadiOptimizerV6(urdf_path, verbose=False)
@@ -120,32 +110,25 @@ except Exception as e:
     metrics_v6 = {'energy': metrics_v4['energy']['total_energy']}
     has_v6 = False
 
-print("\n" + "="*80)
-print("PHASE 2 VALUE PROPOSITION:")
-print("="*80)
-print(f"❌ BASELINE: {total_baseline_violations} violations")
+print(f" BASELINE: {total_baseline_violations} violations")
 print(f"   - Ignores robot constraints")
 print(f"   - Would damage robot or fail")
 print("")
-print(f"✅ PHASE 2 V4: 0 violations, {metrics_v4['energy']['total_energy']:.1f} J")
+print(f"PHASE 2 V4: 0 violations, {metrics_v4['energy']['total_energy']:.1f} J")
 print(f"   - Respects ALL constraints")
 print(f"   - Safe to execute")
 print("")
 if has_v6:
-    print(f"✅ PHASE 2 V6: 0 violations, {metrics_v6['energy']:.1f} J")
+    print(f"PHASE 2 V6: 0 violations, {metrics_v6['energy']:.1f} J")
     if reduction > 0:
         print(f"   - {reduction:.0f}% more energy-efficient than V4")
     print(f"   - Optimal solution")
-print("="*80)
 
-print(f"\n📊 BENCHMARK SUMMARY:")
+print(f"\nBENCHMARK SUMMARY:")
 print(f"   Constraint Satisfaction: V4 fixes {total_baseline_violations} violations")
 if has_v6 and reduction > 0:
     print(f"   Energy Optimization: V6 reduces energy by {reduction:.0f}%")
 print(f"   Planning Time: {v4_time:.1f}s (V4), {v6_time:.1f}s (V6)")
-
-# Visualization
-print("\n🎬 Starting visualization... (Ctrl+C to stop)")
 
 client = p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -181,8 +164,5 @@ try:
             
             time.sleep(0.05)
         time.sleep(0.5)
-except KeyboardInterrupt:
-    print("\n⏸️  Stopped")
 
 p.disconnect()
-print("\n✅ Demo complete!\n")
