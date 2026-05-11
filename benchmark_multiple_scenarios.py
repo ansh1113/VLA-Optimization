@@ -126,9 +126,7 @@ def benchmark_robot_multi_scenario(urdf_path, robot_name, n_scenarios=10):
     }
     
     # Print summary
-    print(f"\n{'='*80}")
     print(f"SUMMARY: {robot_name}")
-    print(f"{'='*80}")
     print(f"V4: {results['summary']['v4']['mean_energy']:.1f} ± {results['summary']['v4']['std_energy']:.1f} J")
     print(f"    Time: {results['summary']['v4']['mean_time']:.2f}s")
     print(f"    Success: {results['summary']['v4']['success_rate']*100:.0f}%")
@@ -181,6 +179,5 @@ if __name__ == "__main__":
         
         print(f"{r['robot']:<20} {r['dof']:<5} {v4_str:<15} {v6_str:<15} {red_str:<15}")
     
-    print(f"{'='*80}")
-    print("\n✅ Results saved to: benchmark_multi_scenario_results.json")
+    print("\nResults saved to: benchmark_multi_scenario_results.json")
 
