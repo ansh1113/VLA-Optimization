@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# PyBullet
+*.bullet
+
+# Results
+*.json
+*.png
+*.mp4
+*.avi
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Conda
+*.conda
+
+# Large files
+robots/*/meshes/*.stl
+robots/*/meshes/*.dae
+*.tar.gz
+
+# Keep structure but ignore large mesh files
+!robots/franka/*.urdf
+!robots/ur5e/*.urdf
+!robots/unitree_ros/**/*.urdf

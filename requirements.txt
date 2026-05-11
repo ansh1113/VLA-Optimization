@@ -1,0 +1,13 @@
+# Core dependencies
+pinocchio>=3.0.0
+casadi>=3.6.0
+proxsuite>=0.6.0
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Visualization
+pybullet>=3.2.0
+matplotlib>=3.5.0
+
+# Optional (for collision detection)
+# hpp-fcl>=2.4.0  # Install via conda-forge
