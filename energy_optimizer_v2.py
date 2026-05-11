@@ -1,6 +1,6 @@
 import coal
 """
-Production Energy Optimizer V2 - VERIFIED ITERATIVE TOPP-RA
+ Energy Optimizer V2, ITERATIVE TOPP-RA
 
 Final Architecture:
 1. Static feasibility rejection (gravity vs torque)
@@ -60,9 +60,6 @@ class EnergyOptimizerV2:
         powers = np.abs(np.sum(torques * v_traj, axis=1))
         peak_power = np.max(powers)
         
-        # Thermal load proxy: Absolute mechanical work integral
-        # Since we resample at control_dt, we need the dt for the sum
-        # We'll calculate it inside compute_trajectory_energy for accuracy
         return {
             'peak_torque': peak_torque,
             'peak_velocity': peak_velocity,
