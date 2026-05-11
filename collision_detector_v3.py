@@ -1,6 +1,6 @@
 import coal
 """
-Production Collision Detector V3 - FIXED URDF Parsing & Auto-Filtering
+Collision Detector V3 
 
 Properly maps URDF links to Pinocchio joint frames and automatically
 filters out false-positive collisions using Kinematic Distance.
@@ -21,9 +21,6 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="pinocchio")
 
 class CollisionDetectorV3:
-    """
-    Production collision detection with proper URDF→Pinocchio mapping.
-    """
     
     def __init__(
         self,
@@ -223,9 +220,6 @@ class CollisionDetectorV3:
                 collision_model.addGeometryObject(geom_obj)
                 geom_count += 1
         
-        # --- NEW: EXPLICIT WHITELIST PAIRING ---
-        # Instead of adding all and removing (which bugs out in Pinocchio Python),
-        # we start empty and explicitly ONLY pair geometries that are >2 joints apart.
         n_geoms = len(collision_model.geometryObjects)
         for i in range(n_geoms):
             for j in range(i + 1, n_geoms):
@@ -294,7 +288,7 @@ class CollisionDetectorV3:
 
 if __name__ == "__main__":
     print("="*80)
-    print("COLLISION DETECTOR V3 - FIXED MAPPING")
+    print("COLLISION DETECTOR V3")
     print("="*80)
     
     urdf = "/scratch/anshb3/ovla/robots/unitree_ros/robots/g1_description/g1_23dof.urdf"
@@ -304,6 +298,5 @@ if __name__ == "__main__":
         q_neutral = np.zeros(detector.nq)
         report = detector.get_collision_report(q_neutral)
         print(f"\nHas collision: {report['has_collision']}")
-        print("\n✅ COLLISION DETECTOR V3 WORKING")
     except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+        print(f"\n ERROR: {e}")
