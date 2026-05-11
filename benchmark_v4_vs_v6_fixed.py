@@ -1,6 +1,6 @@
 import coal
 """
-BENCHMARK V4 vs V6 - FIXED QUADRUPED INITIALIZATION
+BENCHMARK V4 vs V6 
 
 Uses safe starting poses for all robots.
 """
@@ -73,7 +73,7 @@ class BenchmarkV4vsV6Fixed:
         v4_results = []
         v6_results = []
         
-        print(f"\nRunning {n_trials} trials...")
+        print(f"\nRunning {n_trials} trials")
         
         for trial in range(n_trials):
             # Safe starting pose
@@ -130,7 +130,6 @@ class BenchmarkV4vsV6Fixed:
                     'duration': 9999, 'solve_time': 9999
                 })
             
-            print(" ✓")
         
         # Aggregate
         def aggregate(results):
@@ -170,14 +169,12 @@ class BenchmarkV4vsV6Fixed:
         if v4_agg['success_rate'] > 0 and v6_agg['success_rate'] > 0:
             energy_imp = ((v4_agg['energy']['mean'] - v6_agg['energy']['mean']) / v4_agg['energy']['mean']) * 100
             torque_imp = ((v4_agg['peak_torque']['mean'] - v6_agg['peak_torque']['mean']) / v4_agg['peak_torque']['mean']) * 100
-            print(f"\n  📊 V6 IMPROVEMENTS: Energy {energy_imp:+.1f}%, Torque {torque_imp:+.1f}%")
+            print(f"\n  V6 IMPROVEMENTS: Energy {energy_imp:+.1f}%, Torque {torque_imp:+.1f}%")
         
         self.results[robot_name] = {'v4': v4_agg, 'v6': v6_agg, 'dof': model.nq}
     
     def run(self):
-        print("="*80)
-        print("BENCHMARK: V4 vs V6 (FIXED QUADRUPED INIT)")
-        print("="*80)
+        print("BENCHMARK: V4 vs V6")
         
         robots = [
             ("Franka Panda", "/scratch/anshb3/ovla/robots/franka/franka_panda_with_inertia.urdf"),
@@ -202,7 +199,7 @@ class BenchmarkV4vsV6Fixed:
             json.dump(self.results, f, indent=2)
         
         print(f"\n{'='*80}")
-        print(f"✅ RESULTS: v4_vs_v6_fixed_results.json")
+        print(f"RESULTS: v4_vs_v6_results.json")
         print(f"{'='*80}\n")
 
 
