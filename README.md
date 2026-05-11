@@ -81,22 +81,6 @@ trajectory, metrics = optimizer.optimize_trajectory(
 print(f"Energy: {metrics['energy']['total_energy']:.2f} J")
 ```
 
-### Running Benchmarks
-
-```bash
-# Benchmark V4 vs V6 on multiple robots
-python benchmark_v4_vs_v6_fixed.py
-
-# Multi-scenario benchmark with statistics
-python benchmark_multiple_scenarios.py
-```
-
-### Visualization
-
-```bash
-# PyBullet visualization
-python demo_guaranteed_violations.py
-```
 
 ## System Architecture
 
@@ -121,21 +105,6 @@ Single NLP formulation with:
 
 **Advantages**: 21-46% energy reduction, exploits inertial coupling
 **Limitations**: Slower (1-13s), occasional numerical tolerance violations
-
-## Code Structure
-ovla/
-├── hierarchical_optimizer_v4.py      # V4 pipeline implementation
-├── casadi_optimizer_v6_multi_obstacle.py  # V6 unified optimizer
-├── collision_detector_v3.py          # HPP-FCL collision checking
-├── trajectory_optimizer_proxqp_v2.py # ProxQP constraint satisfaction
-├── collision_avoidance_chomp_v2.py   # CHOMP obstacle avoidance
-├── energy_optimizer_v2.py            # Energy optimization layer
-├── benchmark_v4_vs_v6_fixed.py       # Benchmark script
-├── demo_guaranteed_violations.py     # PyBullet visualization
-└── robots/                           # URDF models
-├── franka/
-├── ur5e/
-└── unitree_ros/
 
 ## Technical Details
 
@@ -169,19 +138,6 @@ The optimizer sees exact derivatives of how joint accelerations couple through t
 - IPOPT convergence tolerance: 1e-6
 - Occasionally produces small violations (~2 per trajectory at endpoints)
 
-## Citation
-
-If you use this code in your research, please cite:
-
-```bibtex
-@article{bhansali2026ovla,
-  title={O-VLA Phase 2: Morphology-Agnostic Trajectory Optimization for Vision-Language-Action Models},
-  author={Bhansali, Ansh},
-  journal={AE 598: Advanced Robotic Planning},
-  year={2026}
-}
-```
-
 ## License
 
 MIT License - see LICENSE file for details
@@ -200,6 +156,3 @@ MIT License - see LICENSE file for details
 - Collision detection via [HPP-FCL](https://github.com/humanoid-path-planner/hpp-fcl)
 - TOPP-RA implementation from [toppra](https://github.com/hungpham2511/toppra)
 
----
-
-**Project Status**: Complete (AE 598 Spring 2026)
