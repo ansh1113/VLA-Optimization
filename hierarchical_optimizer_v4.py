@@ -1,9 +1,8 @@
 import coal
 """
-HierarchicalOptimizerV4 - Production Layer 3
+HierarchicalOptimizerV4
 
 Complete pipeline: ProxQP → CHOMP → TOPP-RA
-No tricks, no seeding, just real optimization.
 """
 
 import numpy as np
@@ -103,11 +102,9 @@ class HierarchicalOptimizerV4:
         
         metrics = {}
         
-        # =====================================================================
         # STEP 1: ProxQP - Constraint-satisfying smooth initialization
-        # =====================================================================
         if self.verbose:
-            print(f"\nStep 1: ProxQP constraint satisfaction...")
+            print(f"\nStep 1: ProxQP constraint satisfaction")
         
         trajectory, proxqp_metrics = self.trajectory_optimizer.optimize_trajectory(
             q_start, q_goal, n_waypoints, dt
@@ -116,7 +113,7 @@ class HierarchicalOptimizerV4:
         metrics['proxqp'] = proxqp_metrics
         
         if self.verbose:
-            print(f"  ✅ ProxQP converged in {proxqp_metrics['iterations']} iterations")
+            print(f" ProxQP converged in {proxqp_metrics['iterations']} iterations")
         
         # Count initial collisions
         init_collisions = sum(
@@ -127,9 +124,7 @@ class HierarchicalOptimizerV4:
         if self.verbose:
             print(f"  Initial collisions: {init_collisions}/{n_waypoints}")
         
-        # =====================================================================
         # STEP 2: CHOMP - Collision avoidance
-        # =====================================================================
         if enable_collision_avoidance and init_collisions > 0:
             if self.verbose:
                 print(f"\nStep 2: CHOMP collision avoidance...")
@@ -157,9 +152,9 @@ class HierarchicalOptimizerV4:
             
             if self.verbose:
                 if chomp_metrics['converged']:
-                    print(f"  ✅ CHOMP: Collision-free in {chomp_metrics['iterations']} iterations")
+                    print(f" CHOMP: Collision-free in {chomp_metrics['iterations']} iterations")
                 else:
-                    print(f"  ⚠️  CHOMP: {chomp_metrics['final_collision_count']}/{n_waypoints} collisions remain")
+                    print(f" CHOMP: {chomp_metrics['final_collision_count']}/{n_waypoints} collisions remain")
         
         elif self.verbose:
             print(f"\nStep 2: Skipping CHOMP (already collision-free)")
@@ -167,11 +162,9 @@ class HierarchicalOptimizerV4:
         else:
             metrics['chomp'] = {'converged': True, 'skipped': True}
         
-        # =====================================================================
         # STEP 3: TOPP-RA - Time-optimal retiming
-        # =====================================================================
         if self.verbose:
-            print(f"\nStep 3: TOPP-RA time-optimal retiming...")
+            print(f"\nStep 3: TOPP-RA time-optimal retiming")
         
         trajectory, final_dt, energy_metrics = self.energy_optimizer.retime_trajectory(
             trajectory, dt
@@ -180,13 +173,11 @@ class HierarchicalOptimizerV4:
         metrics['energy'] = energy_metrics
         
         if self.verbose:
-            print(f"  ✅ TOPP-RA complete")
+            print(f"  TOPP-RA complete")
             print(f"  Duration: {energy_metrics.get('optimal_duration', n_waypoints * dt):.2f}s")
             print(f"  Peak torque: {energy_metrics['peak_torque']:.1f} Nm")
         
-        # =====================================================================
         # FINAL METRICS
-        # =====================================================================
         final_collisions = sum(
             1 for t in range(trajectory.shape[0])
             if self.collision_detector.get_collision_report(trajectory[t])['has_collision']
@@ -210,9 +201,6 @@ class HierarchicalOptimizerV4:
 
 
 if __name__ == "__main__":
-    print("="*80)
-    print("TESTING HIERARCHICAL OPTIMIZER V4")
-    print("="*80)
     
     urdf = "/scratch/anshb3/ovla/robots/franka/franka_panda_with_inertia.urdf"
     optimizer = HierarchicalOptimizerV4(urdf, verbose=True)
@@ -222,5 +210,3 @@ if __name__ == "__main__":
     q_goal = optimizer.trajectory_optimizer.model.lowerPositionLimit + np.random.rand(optimizer.nq) * q_range * 0.5 + q_range * 0.25
     
     trajectory, metrics = optimizer.optimize_trajectory(q_start, q_goal)
-    
-    print("\n✅ TEST COMPLETE")
