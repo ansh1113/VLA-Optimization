@@ -2,7 +2,7 @@ import coal
 """
 CHOMP (Covariant Hamiltonian Optimization for Motion Planning) - V2
 
-Production-grade collision avoidance optimizer.
+collision avoidance optimizer.
 
 Reference:
 Ratliff et al. "CHOMP: Gradient Optimization Techniques for 
@@ -42,9 +42,7 @@ class CHOMPCollisionAvoidance:
     def _compute_smoothness_matrix(self, n_waypoints: int) -> np.ndarray:
         """
         Compute smoothness metric matrix A for covariant gradient.
-        
-        A is derived from K^T K where K is the finite-difference
-        acceleration operator.
+        A is derived from K^T K where K is the finite-difference acceleration operator.
         """
         n_free = n_waypoints - 2
         A = np.zeros((n_free, n_free))
@@ -165,7 +163,6 @@ class CHOMPCollisionAvoidance:
         for iteration in range(max_iter):
             current_lr = learning_rate * (lr_decay ** iteration)
             
-            # --- BETTER: ACCELERATED GRADIENT ---
             traj_lookahead = trajectory + momentum * vel
             grad_obs = self.obstacle_gradient(traj_lookahead, epsilon)
             
@@ -185,7 +182,6 @@ class CHOMPCollisionAvoidance:
             
             trajectory[0], trajectory[-1] = q_start, q_goal
             
-            # --- BETTER: BEST-STATE TRACKING & STOCHASTIC RECOVERY ---
             collision_count = sum(1 for t in range(n_waypoints) if self.collision_detector.get_collision_report(trajectory[t])['has_collision'])
             
             if collision_count < best_collision_count:
@@ -195,7 +191,6 @@ class CHOMPCollisionAvoidance:
             else:
                 stuck_counter += 1
 
-            # If we are stuck or getting worse, revert to best and apply a smooth wiggle
             if (stuck_counter > 10 or collision_count > best_collision_count) and collision_count > 0:
                 trajectory = best_trajectory.copy()
                 # Apply a random covariant nudge (smoothed by A_inv)
@@ -214,7 +209,7 @@ class CHOMPCollisionAvoidance:
             
             if collision_count == 0:
                 if self.verbose:
-                    print(f"  ✅ Collision-free at iteration {iteration}")
+                    print(f" Collision-free at iteration {iteration}")
                 break
         
         return best_trajectory if best_collision_count < collision_count else trajectory, {
